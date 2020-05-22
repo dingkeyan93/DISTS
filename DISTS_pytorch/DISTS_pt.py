@@ -111,7 +111,7 @@ class DISTS(torch.nn.Module):
         else:
             return score
 
-def prepare_image(image, resize=False):
+def prepare_image(image, resize=True):
     if resize and min(image.size)>256:
         image = transforms.functional.resize(image,256)
     image = transforms.ToTensor()(image)

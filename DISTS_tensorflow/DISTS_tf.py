@@ -63,7 +63,7 @@ class DISTS():
         with tf.variable_scope(name) as _:
             filter = tf.squeeze(tf.constant(self.parameters['L2'+name], name = "filter"),3)
             conv = tf.nn.conv2d(input**2, filter, strides=2, padding=[[0, 0], [1, 0], [1, 0], [0, 0]])
-            return tf.sqrt(conv)     
+            return tf.sqrt(tf.maximum(conv, 1e-12))     
 
     def get_conv_filter(self, name):
         return tf.constant(self.parameters[name+'_weight'], name = "filter")
