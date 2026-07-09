@@ -28,7 +28,10 @@ class L2pooling(nn.Module):
 class DISTS(torch.nn.Module):
     def __init__(self, load_weights=True):
         super(DISTS, self).__init__()
-        vgg_pretrained_features = models.vgg16(pretrained=True).features
+        vgg_pretrained_features = models.vgg16(pretrained=False).features
+        vgg_ref = importlib.resources.files('DISTS_pytorch').joinpath('vgg16_features.pt')
+        with importlib.resources.as_file(vgg_ref) as vgg_weights_path:
+            vgg_pretrained_features.load_state_dict(torch.load(vgg_weights_path, weights_only=True))
         self.stage1 = torch.nn.Sequential()
         self.stage2 = torch.nn.Sequential()
         self.stage3 = torch.nn.Sequential()
