@@ -1,6 +1,7 @@
 # This is a pytoch implementation of DISTS metric.
 # Requirements: python >= 3.6, pytorch >= 1.0
 
+import importlib.resources
 import numpy as np
 import os,sys
 import torch
@@ -27,7 +28,10 @@ class L2pooling(nn.Module):
 class DISTS(torch.nn.Module):
     def __init__(self, load_weights=True):
         super(DISTS, self).__init__()
-        vgg_pretrained_features = models.vgg16(pretrained=True).features
+        vgg_pretrained_features = models.vgg16(pretrained=False).features
+        vgg_ref = importlib.resources.files('DISTS_pytorch').joinpath('vgg16_features.pt')
+        with importlib.resources.as_file(vgg_ref) as vgg_weights_path:
+            vgg_pretrained_features.load_state_dict(torch.load(vgg_weights_path, weights_only=True))
         self.stage1 = torch.nn.Sequential()
         self.stage2 = torch.nn.Sequential()
         self.stage3 = torch.nn.Sequential()
@@ -60,7 +64,9 @@ class DISTS(torch.nn.Module):
         self.alpha.data.normal_(0.1,0.01)
         self.beta.data.normal_(0.1,0.01)
         if load_weights:
-            weights = torch.load(os.path.join(sys.prefix,'weights.pt'))
+            w_ref = importlib.resources.files('DISTS_pytorch').joinpath('weights.pt')
+            with importlib.resources.as_file(w_ref) as weights_path:
+                weights = torch.load(weights_path, weights_only=True)
             self.alpha.data = weights['alpha']
             self.beta.data = weights['beta']
         
