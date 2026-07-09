@@ -1,6 +1,7 @@
 # This is a pytoch implementation of DISTS metric.
 # Requirements: python >= 3.6, pytorch >= 1.0
 
+import importlib.resources
 import numpy as np
 import os,sys
 import torch
@@ -60,7 +61,9 @@ class DISTS(torch.nn.Module):
         self.alpha.data.normal_(0.1,0.01)
         self.beta.data.normal_(0.1,0.01)
         if load_weights:
-            weights = torch.load(os.path.join(sys.prefix,'weights.pt'))
+            w_ref = importlib.resources.files('DISTS_pytorch').joinpath('weights.pt')
+            with importlib.resources.as_file(w_ref) as weights_path:
+                weights = torch.load(weights_path, weights_only=True)
             self.alpha.data = weights['alpha']
             self.beta.data = weights['beta']
         
